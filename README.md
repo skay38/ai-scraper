@@ -65,7 +65,7 @@ Use **requests or httpx** to fetch the HTML content of the pages. You should not
 
 Once the text is extracted, send it to a LLM (GPT-4o Mini) to structure the data.
 
-Model name: `gpt-4o-mini-2024-07-18-free`
+Model name: `gpt-4.1-mini`
 
 API Key: ask for it
 
