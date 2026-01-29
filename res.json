@@ -1,0 +1,474 @@
+[
+  {
+    "url": "cadopay.app",
+    "success": true,
+    "data": {
+      "company_name": "Cadopay",
+      "company_description": "Unknown",
+      "business_type": "Unknown",
+      "pricing": "Pricing information not available",
+      "pricing_urls": []
+    },
+    "error": null
+  },
+  {
+    "url": "pulse-experts.com",
+    "success": false,
+    "data": null,
+    "error": "Network error"
+  },
+  {
+    "url": "sirona.tech",
+    "success": true,
+    "data": {
+      "company_name": "Sirona Technologies",
+      "company_description": "Sirona Technologies provides permanent carbon removal through scalable Direct Air Capture technology, offering certified high-quality carbon credits to help companies meet their climate goals.",
+      "business_type": "B2B",
+      "pricing": "Sirona Technologies offers carbon removal credits at $0.80 per kilogram or $800 per tonne for individuals and small businesses through their self-serve platform. They also sell pre-packaged carbon offsets for specific activities, ranging from $1.60 for a hamburger (2kg CO2) to $376 for a Europe-NYC flight (470kg CO2). Enterprise customers can inquire for custom pricing and volumes through their contact form.",
+      "pricing_urls": [
+        "https://www.sirona.tech/remove-co2"
+      ]
+    },
+    "error": null
+  },
+  {
+    "url": "fabriq.com",
+    "success": true,
+    "data": {
+      "company_name": "FABRIQ architecture",
+      "company_description": "An architectural firm based in Montreal that designs timeless projects adapted to each client's needs, specializing in commercial, residential, industrial, and institutional architecture with award-winning designs and LEED certifications.",
+      "business_type": "B2B",
+      "pricing": "Pricing information not available",
+      "pricing_urls": []
+    },
+    "error": null
+  },
+  {
+    "url": "foxmotors.com",
+    "success": true,
+    "data": {
+      "company_name": "Fox Motors",
+      "company_description": "Fox Motors is a multi-franchise automotive dealership group that sells and services new and used vehicles across 47 locations with 63 automotive brands throughout Michigan.",
+      "business_type": "B2C",
+      "pricing": "Pricing information not available",
+      "pricing_urls": []
+    },
+    "error": null
+  },
+  {
+    "url": "danvaden.com",
+    "success": true,
+    "data": {
+      "company_name": "Vaden Automotive",
+      "company_description": "Greater Savannah's most reputable new and used car dealership group offering multiple automotive brands including GMC, Chevrolet, INFINITI, Cadillac, Nissan, Hyundai, and CDJR across several locations in Georgia and South Carolina.",
+      "business_type": "B2C",
+      "pricing": "Pricing information not available",
+      "pricing_urls": []
+    },
+    "error": null
+  },
+  {
+    "url": "berteranissan.com",
+    "success": true,
+    "data": {
+      "company_name": "Bertera Nissan",
+      "company_description": "Bertera Nissan is an authorized Nissan dealership in Auburn, MA offering new and used Nissan vehicles, financing, service, and parts. They provide hassle-free car buying, expert service, and a commitment to exceeding customer expectations.",
+      "business_type": "B2C",
+      "pricing": "Pricing information not available",
+      "pricing_urls": []
+    },
+    "error": null
+  },
+  {
+    "url": "crowleyauto.com",
+    "success": true,
+    "data": {
+      "company_name": "Crowley Auto Group",
+      "company_description": "Crowley Auto Group has proudly provided the Greater Hartford Area with the best in new & used vehicle price and selection for over 40 years.",
+      "business_type": "B2C",
+      "pricing": "Pricing information not available",
+      "pricing_urls": []
+    },
+    "error": null
+  },
+  {
+    "url": "thinkbeardmore.com",
+    "success": true,
+    "data": {
+      "company_name": "Beardmore Chevrolet Subaru",
+      "company_description": "An automotive dealership in Bellevue, NE that sells new and used vehicles including Subaru, Chevrolet, and Hyundai models, and provides automotive service and parts.",
+      "business_type": "B2C",
+      "pricing": "Pricing information not available",
+      "pricing_urls": []
+    },
+    "error": null
+  },
+  {
+    "url": "automotiveexperts.com",
+    "success": true,
+    "data": {
+      "company_name": "Automotive Experts",
+      "company_description": "Automotive marketing company that provides direct mail, staffed events, and advertising solutions to boost gross profit for car dealerships.",
+      "business_type": "B2B",
+      "pricing": "No pricing information available.",
+      "pricing_urls": [
+        "https://automotiveexperts.com/schedule-a-call"
+      ]
+    },
+    "error": null
+  },
+  {
+    "url": "westhillsautoplex.com",
+    "success": true,
+    "data": {
+      "company_name": "West Hills Autoplex",
+      "company_description": "A used car dealership in Bremerton, WA offering a wide selection of quality used and certified pre-owned vehicles from multiple leading automotive brands.",
+      "business_type": "B2C",
+      "pricing": "Pricing information not available",
+      "pricing_urls": []
+    },
+    "error": null
+  },
+  {
+    "url": "riversidehasit.com",
+    "success": true,
+    "data": {
+      "company_name": "Riverside Auto Group",
+      "company_description": "Multi-franchise automotive dealership offering new and used vehicles from Chevrolet, Ram, Toyota, Nissan, Ford, Honda, GMC, Jeep, Dodge, and Chrysler, along with financing, service, and parts.",
+      "business_type": "B2C",
+      "pricing": "Pricing information not available",
+      "pricing_urls": []
+    },
+    "error": null
+  },
+  {
+    "url": "islandautogroup.com",
+    "success": true,
+    "data": {
+      "company_name": "Island Auto Group",
+      "company_description": "A car dealership group in Staten Island offering new and used vehicle sales, financing, leasing, and automotive services across 15+ brands including Chevrolet, Chrysler, Dodge, Honda, Hyundai, Jeep, Kia, Mazda, Subaru, Toyota, and Volkswagen.",
+      "business_type": "B2C",
+      "pricing": "Pricing information not available",
+      "pricing_urls": []
+    },
+    "error": null
+  },
+  {
+    "url": "youdriveauto.com",
+    "success": true,
+    "data": {
+      "company_name": "You Drive Auto",
+      "company_description": "You Drive Auto is a buy-here-pay-here used car dealership that provides in-house financing and quality used vehicles to customers with all credit types.",
+      "business_type": "B2C",
+      "pricing": "Pricing information not available",
+      "pricing_urls": []
+    },
+    "error": null
+  },
+  {
+    "url": "kiaofduluth.com",
+    "success": false,
+    "data": null,
+    "error": "HTTP 403"
+  },
+  {
+    "url": "krusemotors.com",
+    "success": true,
+    "data": {
+      "company_name": "Kruse Motors",
+      "company_description": "Kruse Motors is a Ford, Buick, GMC, and Lincoln dealership in Marshall, MN offering new and used vehicle sales, auto service, and financing.",
+      "business_type": "B2C",
+      "pricing": "Pricing information not available",
+      "pricing_urls": []
+    },
+    "error": null
+  },
+  {
+    "url": "hamertoyota.com",
+    "success": false,
+    "data": null,
+    "error": "HTTP 403"
+  },
+  {
+    "url": "flatironsimports.com",
+    "success": false,
+    "data": null,
+    "error": "Network error"
+  },
+  {
+    "url": "curryhondamass.com",
+    "success": true,
+    "data": {
+      "company_name": "Curry Honda Chicopee",
+      "company_description": "Honda dealership selling new and used Honda vehicles, providing automotive services, and offering financing options in Chicopee, MA.",
+      "business_type": "B2C",
+      "pricing": "Pricing information not available",
+      "pricing_urls": []
+    },
+    "error": null
+  },
+  {
+    "url": "rogerbeasley.com",
+    "success": false,
+    "data": null,
+    "error": "Network error"
+  },
+  {
+    "url": "taylorchev.com",
+    "success": true,
+    "data": {
+      "company_name": "Taylor Chevrolet Cadillac",
+      "company_description": "A Chevrolet and Cadillac dealership in Rexburg, Idaho offering new and pre-owned vehicles, automotive service, parts, and financing options to customers in Idaho Falls, Rigby, and surrounding areas.",
+      "business_type": "B2C",
+      "pricing": "Pricing information not available",
+      "pricing_urls": []
+    },
+    "error": null
+  },
+  {
+    "url": "harteautogroup.com",
+    "success": false,
+    "data": null,
+    "error": "HTTP 403"
+  },
+  {
+    "url": "millsautogroup.com",
+    "success": false,
+    "data": null,
+    "error": "HTTP 403"
+  },
+  {
+    "url": "prestigemotorsca.com",
+    "success": false,
+    "data": null,
+    "error": "HTTP 503"
+  },
+  {
+    "url": "andersonautomotive.com",
+    "success": true,
+    "data": {
+      "company_name": "Anderson Automotive",
+      "company_description": "Anderson Automotive is a multi-location automotive dealership group serving the Baltimore area since 1919, offering Honda, Buick, and GMC vehicle sales, service, and collision repair services.",
+      "business_type": "B2C",
+      "pricing": "Pricing information not available",
+      "pricing_urls": []
+    },
+    "error": null
+  },
+  {
+    "url": "graniterun.com",
+    "success": true,
+    "data": {
+      "company_name": "Granite Run Buick GMC Inc.",
+      "company_description": "Granite Run Buick GMC Inc. is a Buick and GMC dealership in Media, PA that offers new and used vehicles, auto financing, parts, and service for customers in the Philadelphia area.",
+      "business_type": "B2C",
+      "pricing": "Pricing information not available",
+      "pricing_urls": []
+    },
+    "error": null
+  },
+  {
+    "url": "martysgmc.com",
+    "success": false,
+    "data": null,
+    "error": "Network error"
+  },
+  {
+    "url": "continentalautogroup.com",
+    "success": true,
+    "data": {
+      "company_name": "Continental Auto Group",
+      "company_description": "Family owned and operated automotive dealer serving Alaskans since 1971, offering new and used vehicles, car repair services, parts, and tires across multiple brands including Honda, Acura, Mazda, Nissan, Subaru, and Volvo.",
+      "business_type": "B2C",
+      "pricing": "Pricing information not available",
+      "pricing_urls": []
+    },
+    "error": null
+  },
+  {
+    "url": "bcautoplex.com",
+    "success": false,
+    "data": null,
+    "error": "HTTP 403"
+  },
+  {
+    "url": "brentbrownauto.com",
+    "success": false,
+    "data": null,
+    "error": "Network error"
+  },
+  {
+    "url": "hanselauto.com",
+    "success": false,
+    "data": null,
+    "error": "HTTP 403"
+  },
+  {
+    "url": "firstteamauto.com",
+    "success": false,
+    "data": null,
+    "error": "HTTP 403"
+  },
+  {
+    "url": "buythomas.com",
+    "success": true,
+    "data": {
+      "company_name": "Thomas Automotive",
+      "company_description": "Thomas Automotive provides sales, service, and parts for Chevrolet, Buick, GMC, Subaru, and Hyundai vehicles in Bedford, Johnstown, and Cumberland.",
+      "business_type": "B2C",
+      "pricing": "Pricing information not available",
+      "pricing_urls": []
+    },
+    "error": null
+  },
+  {
+    "url": "valentiauto.com",
+    "success": false,
+    "data": null,
+    "error": "Network error"
+  },
+  {
+    "url": "grubbs.com",
+    "success": false,
+    "data": null,
+    "error": "Network error"
+  },
+  {
+    "url": "automatchusa.com",
+    "success": true,
+    "data": {
+      "company_name": "Unknown",
+      "company_description": "Unknown",
+      "business_type": "Unknown",
+      "pricing": "Pricing information not available",
+      "pricing_urls": []
+    },
+    "error": null
+  },
+  {
+    "url": "capitalautomotive.com",
+    "success": true,
+    "data": {
+      "company_name": "Capital Automotive",
+      "company_description": "The first company solely focused on providing highly tailored sale-leaseback capital to the automotive retail industry, supporting automobile dealers since 1998.",
+      "business_type": "B2B",
+      "pricing": "Pricing information not available",
+      "pricing_urls": []
+    },
+    "error": null
+  },
+  {
+    "url": "offleaseonly.com",
+    "success": false,
+    "data": null,
+    "error": "Network error"
+  },
+  {
+    "url": "hoffmanauto.com",
+    "success": true,
+    "data": {
+      "company_name": "Hoffman Auto Group",
+      "company_description": "A multi-franchise automotive dealer group serving Connecticut since 1921, offering sales and service for brands including Audi, BMW, Ford, Honda, Lexus, Lincoln, Toyota, Porsche, and Genesis.",
+      "business_type": "B2C",
+      "pricing": "Pricing information not available",
+      "pricing_urls": []
+    },
+    "error": null
+  },
+  {
+    "url": "hertrichs.com",
+    "success": true,
+    "data": {
+      "company_name": "The Hertrich Family of Dealerships",
+      "company_description": "A multi-franchise automotive dealer group that sells and services vehicles from 18 brands across Delaware, Maryland, and New Jersey, offering new, certified pre-owned, and used vehicles along with service and parts.",
+      "business_type": "B2C",
+      "pricing": "Pricing information not available",
+      "pricing_urls": []
+    },
+    "error": null
+  },
+  {
+    "url": "lexusofchattanooga.com",
+    "success": false,
+    "data": null,
+    "error": "HTTP 403"
+  },
+  {
+    "url": "autogiants.com",
+    "success": false,
+    "data": null,
+    "error": "HTTP 403"
+  },
+  {
+    "url": "durangomotorcompany.com",
+    "success": true,
+    "data": {
+      "company_name": "Durango Motor Company",
+      "company_description": "Durango Motor Company is a locally owned automotive dealership in Durango, Colorado, serving as a one-stop shop for all automotive needs including new and pre-owned vehicle sales, service, parts, detailing, and accessories.",
+      "business_type": "B2C",
+      "pricing": "Pricing information not available",
+      "pricing_urls": []
+    },
+    "error": null
+  },
+  {
+    "url": "vivaautogroup.com",
+    "success": false,
+    "data": null,
+    "error": "HTTP 403"
+  },
+  {
+    "url": "landroverpalmbeach.com",
+    "success": false,
+    "data": null,
+    "error": "HTTP 403"
+  },
+  {
+    "url": "koeppelautogroup.com",
+    "success": false,
+    "data": null,
+    "error": "Network error"
+  },
+  {
+    "url": "unionpark.com",
+    "success": true,
+    "data": {
+      "company_name": "Union Park Auto Group",
+      "company_description": "A multi-brand automotive dealership offering new and used vehicle sales, service, parts, collision repair, and auto spa services for BMW, Honda, Buick, GMC, and Volvo brands.",
+      "business_type": "B2C",
+      "pricing": "Pricing information not available",
+      "pricing_urls": []
+    },
+    "error": null
+  },
+  {
+    "url": "jerrystexas.com",
+    "success": true,
+    "data": {
+      "company_name": "Jerry Durant Auto Group",
+      "company_description": "Jerry Durant Auto Group is a multi-franchise auto dealership group that sells and services CADILLAC, Buick, Chevrolet, Genesis, GMC, and Hyundai vehicles in the greater Weatherford, TX area.",
+      "business_type": "B2C",
+      "pricing": "Pricing information not available",
+      "pricing_urls": []
+    },
+    "error": null
+  },
+  {
+    "url": "winnerauto.com",
+    "success": true,
+    "data": {
+      "company_name": "Winner Automotive",
+      "company_description": "Winner Automotive Group is an automotive dealership group established in 1973 that sells new and used vehicles across multiple brands including Audi, Chevrolet, Ford, Hyundai, Subaru, and Volkswagen.",
+      "business_type": "B2C",
+      "pricing": "Pricing information not available",
+      "pricing_urls": []
+    },
+    "error": null
+  },
+  {
+    "url": "caseyauto.com",
+    "success": false,
+    "data": null,
+    "error": "HTTP 403"
+  }
+]
