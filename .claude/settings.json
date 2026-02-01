@@ -34,7 +34,7 @@
         "hooks": [
           {
             "type": "prompt",
-            "prompt": "Before ending, check if there are uncommitted changes to Python files. If so, briefly list the modified files and suggest running /simplify on them to review for potential improvements. Keep it concise.",
+            "prompt": "Before ending, analyze the session and suggest relevant follow-ups:\n\n1. If Python files were modified, suggest /review for a complete code review\n2. For any Python source files (not test files) that were created or modified, suggest /test-gen <file> to ensure test coverage is complete\n3. If code was edited with added complexity, suggest /simplify\n\nOnly mention relevant suggestions. Be concise. If nothing applies, say nothing.",
             "timeout": 30
           }
         ]
