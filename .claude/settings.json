@@ -6,8 +6,13 @@
         "hooks": [
           {
             "type": "command",
-            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/format.sh",
+            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/lint-format.sh",
             "timeout": 30
+          },
+          {
+            "type": "command",
+            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/check-quality.sh",
+            "timeout": 10
           }
         ]
       }
@@ -28,9 +33,9 @@
       {
         "hooks": [
           {
-            "type": "prompt",
-            "prompt": "Before ending, analyze the session and suggest relevant follow-ups:\n\n1. If Python files were modified, suggest /review for a complete code review\n2. For any Python source files (not test files) that were created or modified, suggest /test-gen <file> to ensure test coverage is complete\n3. If code was edited with added complexity, suggest /simplify\n\nOnly mention relevant suggestions. Be concise. If nothing applies, say nothing.",
-            "timeout": 30
+            "type": "agent",
+            "prompt": "You are a code quality reviewer. Check the session transcript to determine if follow-up actions are needed.\n\nReview what was done and check:\n1. Were Python files modified? If yes, and no tests were run, suggest running /test\n2. Were new functions added without corresponding tests? Suggest /test-gen <file>\n3. Was complex logic added that could be simplified? Suggest /simplify\n4. Were significant changes made that warrant a full review? Suggest /review\n\nReturn {\"ok\": true} if no follow-ups needed, or {\"ok\": false, \"reason\": \"Suggested: <your suggestions>\"} with concise, relevant suggestions only.",
+            "timeout": 60
           }
         ]
       }
