@@ -1,27 +1,44 @@
 from pathlib import Path
-from typing import List
 
-from services.scraper import ScrapingResult
+from logger import logger
+from models import ScrapingResult
 
 
-async def load_domains(path: Path, limit: int) -> List[str]:
+def load_domains(path: Path, limit: int) -> list[str]:
+    """Load domain list from CSV file.
+
+    Args:
+        path: Path to CSV file
+        limit: Maximum number of domains to load
+
+    Returns:
+        List of domain strings
+    """
     domains: list[str] = []
-    index = 0
     with path.open() as file:
-        for line in file:
-            domain = line.strip()
-            if not domain:
-                continue
-            domains.append(domain)
-            index += 1
+        for index, line in enumerate(file):
             if index >= limit:
                 break
+            domain = line.strip()
+            if domain:
+                domains.append(domain)
 
     return domains
 
 
-def display_result(result: ScrapingResult):
+def display_result(result: ScrapingResult) -> None:
+    """Display a scraping result.
+
+    Args:
+        result: Scraping result to display
+    """
     if result.success and result.data:
-        print(f"✅  {result.url} -> {result.data.pricing}")
+        logger.info(
+            "Scraping succeeded",
+            extra={"url": result.url, "pricing": result.data.pricing},
+        )
     else:
-        print(f"❌  {result.url} -> {result.error}")
+        logger.warning(
+            "Scraping failed",
+            extra={"url": result.url, "error": result.error},
+        )

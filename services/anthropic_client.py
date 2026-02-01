@@ -2,11 +2,10 @@
 
 import asyncio
 import json
-import os
 import re
-from typing import Optional
 
-from anthropic import Anthropic, AsyncAnthropic, RateLimitError, APIError
+from anthropic import APIError, AsyncAnthropic, RateLimitError
+from anthropic.types import TextBlock
 from bs4 import BeautifulSoup
 
 from config import (
@@ -14,14 +13,21 @@ from config import (
     ANTHROPIC_MODEL,
     HTML_TRUNCATE_MAIN,
     HTML_TRUNCATE_PRICING,
+    MAX_PRICING_URLS,
     MAX_TOKENS,
 )
+from enums import PricingStatus
+from exceptions import ApiResponseError, JsonParseError, RateLimitExceededError
+from logger import logger
+from models import CompanyExtractionData
 
 
 class AnthropicClient:
     """Client for extracting structured data using Anthropic's Claude API."""
 
-    def __init__(self, api_key: str, semaphore: Optional[asyncio.Semaphore] = None):
+    def __init__(
+        self, api_key: str, semaphore: asyncio.Semaphore | None = None
+    ) -> None:
         """Initialize Anthropic client.
 
         Args:
@@ -42,22 +48,14 @@ class AnthropicClient:
         """
         soup = BeautifulSoup(html, "html.parser")
 
-        # Remove script and style elements
         for script in soup(["script", "style", "noscript"]):
             script.decompose()
 
-        # # Get text and clean whitespace
-        # text = soup.get_text()
-        # lines = (line.strip() for line in text.splitlines())
-        # chunks = (phrase.strip() for line in lines for phrase in line.split("  "))
-        # text = " ".join(chunk for chunk in chunks if chunk)
-
-        # return html content as string
         return soup.prettify()
 
     async def _call_api(
         self, prompt: str, max_retries: int = 3
-    ) -> tuple[bool, str, Optional[str]]:
+    ) -> tuple[bool, str, str | None]:
         """Call Anthropic API with retry logic.
 
         Args:
@@ -76,34 +74,25 @@ class AnthropicClient:
                         messages=[{"role": "user", "content": prompt}],
                     )
 
-                    # Extract text content
-                    content = response.content[0].text
-                    return (True, content, None)
+                    first_block = response.content[0]
+                    if not isinstance(first_block, TextBlock):
+                        return (False, "Unexpected response type", "invalid_response")
+                    return (True, first_block.text, None)
 
                 except RateLimitError as e:
-                    error_msg = f"Rate limit error: {str(e)}"
-                    error_type = "rate_limit"
-                    # Exponential backoff for rate limits
                     if attempt < max_retries - 1:
                         await asyncio.sleep(2 ** (attempt + 1))
                     else:
-                        return (False, error_msg, error_type)
+                        raise RateLimitExceededError("Rate limit exceeded") from e
 
                 except APIError as e:
-                    error_msg = f"Anthropic API error: {str(e)}"
-                    error_type = "api_error"
-                    return (False, error_msg, error_type)
-
-                except Exception as e:
-                    error_msg = f"Unexpected error: {str(e)}"
-                    error_type = "unexpected_error"
-                    return (False, error_msg, error_type)
+                    raise ApiResponseError("Anthropic API error") from e
 
             return (False, "Max retries exceeded", "max_retries")
 
     async def extract_company_data(
         self, html: str, url: str
-    ) -> tuple[bool, Optional[dict], Optional[str]]:
+    ) -> tuple[bool, CompanyExtractionData | None, str | None]:
         """Extract company data and pricing URLs from main page HTML.
 
         Args:
@@ -111,14 +100,15 @@ class AnthropicClient:
             url: Source URL
 
         Returns:
-            Tuple of (success, data_dict, error_message)
-            data_dict contains: company_name, company_description, business_type, pricing, pricing_urls
+            Tuple of (success, data, error_message)
         """
-        # Clean and truncate HTML
         cleaned = self._clean_html(html)
-        
         truncated = cleaned[:HTML_TRUNCATE_MAIN]
-        print("Truncated from ", len(cleaned), "to", len(truncated))
+
+        logger.debug(
+            "Truncated HTML content",
+            extra={"original_length": len(cleaned), "truncated_length": len(truncated)},
+        )
 
         prompt = f"""You are a data extraction assistant. Analyze the following text content from {url} and extract structured company information.
 
@@ -144,59 +134,81 @@ Return ONLY a JSON object with this exact structure (no markdown, no explanation
 Be concise and accurate. If information is not available, use "Unknown".
 """
 
-        success, response, error_type = await self._call_api(prompt)
-
-        if not success:
-            return (False, None, response)
-
-        # Parse JSON response
         try:
-            # Extract JSON from response (handle markdown code blocks)
+            success, response, error_type = await self._call_api(prompt)
+
+            if not success:
+                return (False, None, response)
+
+            return self._parse_company_response(response, url)
+
+        except (RateLimitExceededError, ApiResponseError) as e:
+            return (False, None, str(e))
+
+    def _parse_company_response(
+        self, response: str, url: str
+    ) -> tuple[bool, CompanyExtractionData | None, str | None]:
+        """Parse JSON response from company data extraction.
+
+        Args:
+            response: Raw response string
+            url: Source URL for resolving relative URLs
+
+        Returns:
+            Tuple of (success, data, error_message)
+        """
+        try:
             json_match = re.search(r"\{[\s\S]*\}", response)
-            if json_match:
-                json_str = json_match.group(0)
-                data = json.loads(json_str)
-            else:
-                return (False, None, "No JSON found in response")
+            if not json_match:
+                raise JsonParseError("No JSON found in response")
 
-            # Validate required fields
-            required_fields = [
-                "company_name",
-                "company_description",
-                "business_type",
-                "pricing",
-            ]
-            for field in required_fields:
-                if field not in data:
-                    data[field] = "Unknown"
+            json_str = json_match.group(0)
+            raw_data = json.loads(json_str)
 
-            if "pricing_urls" not in data:
-                data["pricing_urls"] = []
+            pricing_urls = self._normalize_pricing_urls(
+                raw_data.get("pricing_urls", []), url
+            )
 
-            # Ensure pricing_urls is a list
-            if not isinstance(data["pricing_urls"], list):
-                data["pricing_urls"] = []
-
-            # Filter pricing URLs to ensure they're absolute URLs
-            if data["pricing_urls"]:
-                filtered_urls = []
-                for pricing_url in data["pricing_urls"]:
-                    # If relative URL, convert to absolute
-                    if pricing_url.startswith("/"):
-                        base_url = url.rstrip("/")
-                        filtered_urls.append(f"{base_url}{pricing_url}")
-                    elif pricing_url.startswith(("http://", "https://")):
-                        filtered_urls.append(pricing_url)
-                data["pricing_urls"] = filtered_urls[:3]  # Limit to 3 pricing URLs
+            data = CompanyExtractionData(
+                company_name=raw_data.get("company_name", PricingStatus.UNKNOWN),
+                company_description=raw_data.get(
+                    "company_description", PricingStatus.NOT_AVAILABLE
+                ),
+                business_type=raw_data.get("business_type", PricingStatus.UNKNOWN),
+                pricing=raw_data.get("pricing", PricingStatus.NOT_FOUND_ON_MAIN_PAGE),
+                pricing_urls=pricing_urls,
+            )
 
             return (True, data, None)
 
         except json.JSONDecodeError as e:
-            return (False, None, f"Failed to parse JSON: {str(e)}")
-        except Exception as e:
-            return (False, None, f"Error processing response: {str(e)}")
+            raise JsonParseError("Failed to parse JSON") from e
 
-    async def extract_pricing(self, html: str) -> tuple[bool, str, Optional[str]]:
+    def _normalize_pricing_urls(
+        self, pricing_urls: list | None, base_url: str
+    ) -> list[str]:
+        """Normalize pricing URLs to absolute URLs.
+
+        Args:
+            pricing_urls: Raw pricing URLs from extraction
+            base_url: Base URL for resolving relative paths
+
+        Returns:
+            List of normalized absolute URLs
+        """
+        if not pricing_urls or not isinstance(pricing_urls, list):
+            return []
+
+        normalized: list[str] = []
+        for pricing_url in pricing_urls:
+            if pricing_url.startswith("/"):
+                normalized.append(f"{base_url.rstrip('/')}{pricing_url}")
+            elif pricing_url.startswith(("http://", "https://")):
+                normalized.append(pricing_url)
+
+        return normalized[:MAX_PRICING_URLS]
+
+    async def extract_pricing(self, html: str) -> tuple[bool, str, str | None]:
         """Extract pricing details from a pricing page.
 
         Args:
@@ -205,7 +217,6 @@ Be concise and accurate. If information is not available, use "Unknown".
         Returns:
             Tuple of (success, pricing_summary, error_message)
         """
-        # Clean and truncate HTML
         cleaned = self._clean_html(html)
         truncated = cleaned[:HTML_TRUNCATE_PRICING]
 
@@ -226,9 +237,13 @@ If no pricing information is found, return "No pricing information available".
 Provide ONLY the pricing summary, no other text or explanation.
 """
 
-        success, response, error_type = await self._call_api(prompt)
+        try:
+            success, response, error_type = await self._call_api(prompt)
 
-        if not success:
-            return (False, "Failed to extract pricing", response)
+            if not success:
+                return (False, "Failed to extract pricing", response)
 
-        return (True, response.strip(), None)
+            return (True, response.strip(), None)
+
+        except (RateLimitExceededError, ApiResponseError) as e:
+            return (False, "Failed to extract pricing", str(e))

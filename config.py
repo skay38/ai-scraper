@@ -18,6 +18,10 @@ ANTHROPIC_CONCURRENCY = 10  # concurrent Anthropic API calls
 HTML_TRUNCATE_MAIN = 500000  # characters for main page
 HTML_TRUNCATE_PRICING = 300000  # characters for pricing pages
 
+# Scraping limits
+MAX_PRICING_URLS = 3  # max pricing pages to fetch per domain
+DEFAULT_IMPORT_LIMIT = 50  # default number of domains to process
+
 # User-Agent
 USER_AGENTS = [
     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",

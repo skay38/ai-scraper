@@ -1,25 +1,15 @@
+"""Scraper service for extracting company data from URLs."""
+
 import asyncio
-from typing import Optional
 
-from pydantic import BaseModel, ValidationError
+from pydantic import ValidationError as PydanticValidationError
 
+from config import MAX_PRICING_URLS
+from enums import PricingStatus
+from exceptions import ValidationError
+from models import ScrapingData, ScrapingResult
 from services.anthropic_client import AnthropicClient
 from services.http_client import HttpClient
-
-
-class ScrapingData(BaseModel):
-    company_name: str
-    company_description: str
-    business_type: str
-    pricing: str
-    pricing_urls: list[str] = []
-
-
-class ScrapingResult(BaseModel):
-    url: str
-    success: bool
-    data: ScrapingData | None = None
-    error: str | None = None
 
 
 class ScraperService:
@@ -29,7 +19,7 @@ class ScraperService:
         self,
         http_client: HttpClient,
         anthropic_client: AnthropicClient,
-    ):
+    ) -> None:
         """Initialize scraper service.
 
         Args:
@@ -56,61 +46,59 @@ class ScraperService:
         Returns:
             ScrapingResult with extracted data or error
         """
-        # Step 1: Fetch main URL
         success, content, error_type = await self.http_client.get(url)
         if not success:
             return ScrapingResult(url=url, success=False, error=content)
-        
-        # Step 2: Extract company data + pricing URLs
-        success, extracted_data, error_msg = await self.anthropic_client.extract_company_data(
-            content, url
-        )
-        if not success:
+
+        (
+            success,
+            extracted_data,
+            error_msg,
+        ) = await self.anthropic_client.extract_company_data(content, url)
+        if not success or extracted_data is None:
             return ScrapingResult(
                 url=url, success=False, error=f"AI extraction failed: {error_msg}"
             )
 
-        # Extract pricing URLs
-        pricing_urls = extracted_data.get("pricing_urls", [])
-        main_pricing = extracted_data.get("pricing", "Not available")
+        pricing_results = await self._fetch_pricing_pages(extracted_data.pricing_urls)
 
-        # Step 3 & 4: Fetch and extract pricing from pricing pages (if any)
-        pricing_results = []
-        if pricing_urls:
-            pricing_tasks = []
-            for pricing_url in pricing_urls[:3]:  # Limit to 3 pricing pages
-                pricing_tasks.append(self._fetch_and_extract_pricing(pricing_url))
+        final_pricing = self._aggregate_pricing(extracted_data.pricing, pricing_results)
 
-            pricing_results = await asyncio.gather(*pricing_tasks, return_exceptions=True)
-
-        # Step 5: Aggregate pricing data
-        final_pricing = self._aggregate_pricing(main_pricing, pricing_results)
-
-        # Step 6: Create final result
         try:
             data = ScrapingData(
-                company_name=extracted_data.get("company_name", "Unknown"),
-                company_description=extracted_data.get("company_description", "Not available"),
-                business_type=extracted_data.get("business_type", "Unknown"),
+                company_name=extracted_data.company_name,
+                company_description=extracted_data.company_description,
+                business_type=extracted_data.business_type,
                 pricing=final_pricing,
-                pricing_urls=pricing_urls if isinstance(pricing_urls, list) else [],
+                pricing_urls=extracted_data.pricing_urls,
             )
             return ScrapingResult(url=url, success=True, data=data)
 
-        except ValidationError as e:
-            return ScrapingResult(
-                url=url,
-                success=False,
-                error=f"Data validation failed: {str(e)}",
-            )
-        except Exception as e:
-            return ScrapingResult(
-                url=url,
-                success=False,
-                error=f"Unexpected error: {str(e)}",
-            )
+        except PydanticValidationError as e:
+            raise ValidationError("Data validation failed") from e
 
-    async def _fetch_and_extract_pricing(self, pricing_url: str) -> Optional[str]:
+    async def _fetch_pricing_pages(
+        self, pricing_urls: list[str]
+    ) -> list[str | None | BaseException]:
+        """Fetch and extract pricing from pricing pages.
+
+        Args:
+            pricing_urls: List of pricing page URLs
+
+        Returns:
+            List of pricing summaries (None for failed extractions, BaseException for errors)
+        """
+        if not pricing_urls:
+            return []
+
+        pricing_tasks = [
+            self._fetch_and_extract_pricing(pricing_url)
+            for pricing_url in pricing_urls[:MAX_PRICING_URLS]
+        ]
+
+        return await asyncio.gather(*pricing_tasks, return_exceptions=True)
+
+    async def _fetch_and_extract_pricing(self, pricing_url: str) -> str | None:
         """Fetch a pricing page and extract pricing info.
 
         Args:
@@ -119,21 +107,23 @@ class ScraperService:
         Returns:
             Pricing summary or None if failed
         """
-        # Fetch pricing page
         success, content, error_type = await self.http_client.get(pricing_url)
         if not success:
             return None
 
-        # Extract pricing
-        success, pricing_summary, error_msg = await self.anthropic_client.extract_pricing(
-            content
-        )
-        if not success or pricing_summary == "No pricing information available":
+        (
+            success,
+            pricing_summary,
+            error_msg,
+        ) = await self.anthropic_client.extract_pricing(content)
+        if not success or pricing_summary == PricingStatus.NO_PRICING_INFO:
             return None
 
         return pricing_summary
 
-    def _aggregate_pricing(self, main_pricing: str, pricing_results: list) -> str:
+    def _aggregate_pricing(
+        self, main_pricing: str, pricing_results: list[str | None | BaseException]
+    ) -> str:
         """Aggregate pricing from main page and pricing pages.
 
         Args:
@@ -143,32 +133,27 @@ class ScraperService:
         Returns:
             Aggregated pricing string
         """
-        # Filter out None and exceptions from pricing results
         valid_pricing = [
-            p for p in pricing_results
-            if p is not None and not isinstance(p, Exception) and p.strip()
+            p
+            for p in pricing_results
+            if p is not None and not isinstance(p, BaseException) and p.strip()
         ]
 
-        # If no pricing found anywhere
-        if not valid_pricing and (
-            not main_pricing
-            or main_pricing in ["Not found on main page", "Not available", "Unknown"]
-        ):
-            return "Pricing information not available"
+        no_pricing_values = [
+            PricingStatus.NOT_FOUND_ON_MAIN_PAGE,
+            PricingStatus.NOT_AVAILABLE,
+            PricingStatus.UNKNOWN,
+        ]
 
-        # If main pricing has good info but no pricing pages
+        main_has_pricing = main_pricing and main_pricing not in no_pricing_values
+
+        if not valid_pricing and not main_has_pricing:
+            return PricingStatus.NOT_AVAILABLE
+
         if not valid_pricing:
-            if main_pricing not in ["Not found on main page", "Not available", "Unknown"]:
-                return main_pricing
-            else:
-                return "Pricing information not available"
+            return main_pricing if main_has_pricing else PricingStatus.NOT_AVAILABLE
 
-        # If we have pricing from pricing pages
-        if valid_pricing:
-            # If main pricing also has good info, combine
-            if main_pricing not in ["Not found on main page", "Not available", "Unknown"]:
-                return f"{main_pricing} | {' | '.join(valid_pricing)}"
-            else:
-                return " | ".join(valid_pricing)
+        if main_has_pricing:
+            return f"{main_pricing} | {' | '.join(valid_pricing)}"
 
-        return "Pricing information not available"
+        return " | ".join(valid_pricing)

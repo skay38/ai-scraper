@@ -6,49 +6,37 @@ from time import time
 
 from dotenv import load_dotenv
 
-from config import ANTHROPIC_CONCURRENCY, HTTP_CONCURRENCY
-from services import http_client
+from config import ANTHROPIC_CONCURRENCY, DEFAULT_IMPORT_LIMIT, HTTP_CONCURRENCY
+from enums import PricingStatus
+from logger import logger
+from models import ScrapingResult
 from services.anthropic_client import AnthropicClient
 from services.http_client import HttpClient
 from services.scraper import ScraperService
 from utils import display_result, load_domains
 
-# Load environment variables
 load_dotenv()
 
-IMPORT_LIMIT = 50  # Start with 5 URLs for testing
 DOMAIN_LIST_PATH = Path("data", "domains.csv")
 
 
-async def main():
+async def main() -> None:
     """Main entry point for the scraper."""
-    # Verify API key
     api_key = os.getenv("ANTHROPIC_API_KEY")
     if not api_key:
-        print("❌ Error: ANTHROPIC_API_KEY not found in .env file")
+        logger.error("ANTHROPIC_API_KEY not found in .env file")
         return
 
-    # Load domains
-    domains = await load_domains(DOMAIN_LIST_PATH, IMPORT_LIMIT)
-    print(f"Loaded {len(domains)} domains\n")
-    print(f"Concurrency: {HTTP_CONCURRENCY} HTTP, {ANTHROPIC_CONCURRENCY} Anthropic\n")
+    domains = load_domains(DOMAIN_LIST_PATH, DEFAULT_IMPORT_LIMIT)
+    logger.info("Loaded domains", extra={"count": len(domains)})
+    logger.info(
+        "Concurrency settings",
+        extra={"http": HTTP_CONCURRENCY, "anthropic": ANTHROPIC_CONCURRENCY},
+    )
 
-    # http_client = HttpClient()
-    # anthropic_client = AnthropicClient(api_key=api_key)
-    # scraper = ScraperService(
-    #     http_client=http_client,
-    #     anthropic_client=anthropic_client,
-    # )
-    # # Test with a single URL to verify functionality
-    # result = await scraper.scrape_url(domains[0])
-    # display_result(result)
-    
-    
-    # Create semaphores for concurrency control
     http_semaphore = asyncio.Semaphore(HTTP_CONCURRENCY)
     anthropic_semaphore = asyncio.Semaphore(ANTHROPIC_CONCURRENCY)
 
-    # Initialize clients
     http_client = HttpClient(semaphore=http_semaphore)
     anthropic_client = AnthropicClient(api_key=api_key, semaphore=anthropic_semaphore)
     scraper = ScraperService(
@@ -56,58 +44,62 @@ async def main():
         anthropic_client=anthropic_client,
     )
 
-    # Process URLs concurrently
     start_time = time()
     tasks = [scraper.scrape_url(domain) for domain in domains]
     results = await asyncio.gather(*tasks, return_exceptions=True)
     elapsed = time() - start_time
 
-    # Display results
-    print("\n" + "=" * 80)
-    print("RESULTS")
-    print("=" * 80 + "\n")
+    logger.info("Processing complete", extra={"elapsed_seconds": f"{elapsed:.2f}"})
 
+    scraping_results: list[ScrapingResult] = []
     for result in results:
-        if isinstance(result, Exception):
-            print(f"❌ Exception: {result}")
+        if isinstance(result, BaseException):
+            logger.error("Scraping exception", extra={"error": str(result)})
         else:
+            scraping_results.append(result)
             display_result(result)
 
-    # Display summary
-    successful = sum(1 for r in results if not isinstance(r, Exception) and r.success)
+    successful = sum(1 for r in scraping_results if r.success)
     failed = len(results) - successful
 
-    # Count pricing extracted (not "Pricing information not available" or similar)
     pricing_extracted = sum(
-        1 for r in results
-        if not isinstance(r, Exception)
-        and r.success
+        1
+        for r in scraping_results
+        if r.success
         and r.data
         and r.data.pricing
-        and r.data.pricing not in ["Pricing information not available", "Not available", "Unknown", "Not found on main page"]
+        and r.data.pricing
+        not in [
+            PricingStatus.NOT_AVAILABLE,
+            PricingStatus.NOT_FOUND_ON_MAIN_PAGE,
+            PricingStatus.UNKNOWN,
+        ]
     )
 
-    print("\n" + "=" * 80)
-    print("SUMMARY")
-    print("=" * 80)
-    print(f"Total URLs:        {len(domains)}")
-    print(f"Successful:        {successful} ({successful / len(domains) * 100:.1f}%)")
-    print(f"Failed:            {failed} ({failed / len(domains) * 100:.1f}%)")
-    print(f"Pricing extracted: {pricing_extracted} ({pricing_extracted / len(domains) * 100:.1f}%)")
-    print(f"Elapsed time:      {elapsed:.2f}s")
-    print(f"Avg per URL:       {elapsed / len(domains):.2f}s")
-    print("=" * 80 + "\n")
+    logger.info(
+        "Summary",
+        extra={
+            "total": len(domains),
+            "successful": successful,
+            "successful_pct": f"{successful / len(domains) * 100:.1f}%",
+            "failed": failed,
+            "failed_pct": f"{failed / len(domains) * 100:.1f}%",
+            "pricing_extracted": pricing_extracted,
+            "pricing_pct": f"{pricing_extracted / len(domains) * 100:.1f}%",
+            "elapsed_seconds": f"{elapsed:.2f}",
+            "avg_per_url": f"{elapsed / len(domains):.2f}",
+        },
+    )
 
-    # Save results to JSON
-    json_results = []
+    json_results: list[dict] = []
     for result in results:
-        if not isinstance(result, Exception):
+        if isinstance(result, ScrapingResult):
             json_results.append(result.model_dump())
 
     with open("res.json", "w") as f:
         json.dump(json_results, f, indent=2)
 
-    print(f"✅ Results saved to res.json")
+    logger.info("Results saved", extra={"file": "res.json"})
 
 
 if __name__ == "__main__":
