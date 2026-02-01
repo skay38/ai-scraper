@@ -6,7 +6,12 @@ from time import time
 
 from dotenv import load_dotenv
 
-from config import ANTHROPIC_CONCURRENCY, DEFAULT_IMPORT_LIMIT, HTTP_CONCURRENCY
+from config import (
+    ANTHROPIC_CONCURRENCY,
+    DEFAULT_IMPORT_LIMIT,
+    HTTP_CONCURRENCY,
+    OUTPUT_FILE,
+)
 from enums import PricingStatus
 from logger import logger
 from models import ScrapingResult
@@ -96,10 +101,10 @@ async def main() -> None:
         if isinstance(result, ScrapingResult):
             json_results.append(result.model_dump())
 
-    with open("res.json", "w") as f:
+    with open(OUTPUT_FILE, "w") as f:
         json.dump(json_results, f, indent=2)
 
-    logger.info("Results saved", extra={"file": "res.json"})
+    logger.info("Results saved", extra={"file": OUTPUT_FILE})
 
 
 if __name__ == "__main__":

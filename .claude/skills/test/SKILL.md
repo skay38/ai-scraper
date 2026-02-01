@@ -8,11 +8,11 @@ allowed-tools:
 
 # Test
 
-Run pytest on the project.
+Run pytest on the project with coverage.
 
 Execute:
 ```bash
-uv run pytest
+uv run pytest --cov --cov-report=term-missing
 ```
 
-Report test results including any failures.
+Report test results including any failures and coverage summary.

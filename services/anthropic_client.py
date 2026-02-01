@@ -16,7 +16,7 @@ from config import (
     MAX_PRICING_URLS,
     MAX_TOKENS,
 )
-from enums import PricingStatus
+from enums import BusinessType, PricingStatus
 from exceptions import ApiResponseError, JsonParseError, RateLimitExceededError
 from logger import logger
 from models import CompanyExtractionData
@@ -142,7 +142,7 @@ Be concise and accurate. If information is not available, use "Unknown".
 
             return self._parse_company_response(response, url)
 
-        except (RateLimitExceededError, ApiResponseError) as e:
+        except (RateLimitExceededError, ApiResponseError, JsonParseError) as e:
             return (False, None, str(e))
 
     def _parse_company_response(
@@ -170,12 +170,14 @@ Be concise and accurate. If information is not available, use "Unknown".
             )
 
             data = CompanyExtractionData(
-                company_name=raw_data.get("company_name", PricingStatus.UNKNOWN),
+                company_name=raw_data.get("company_name", BusinessType.UNKNOWN.value),
                 company_description=raw_data.get(
-                    "company_description", PricingStatus.NOT_AVAILABLE
+                    "company_description", BusinessType.UNKNOWN.value
                 ),
-                business_type=raw_data.get("business_type", PricingStatus.UNKNOWN),
-                pricing=raw_data.get("pricing", PricingStatus.NOT_FOUND_ON_MAIN_PAGE),
+                business_type=raw_data.get("business_type", BusinessType.UNKNOWN.value),
+                pricing=raw_data.get(
+                    "pricing", PricingStatus.NOT_FOUND_ON_MAIN_PAGE.value
+                ),
                 pricing_urls=pricing_urls,
             )
 
