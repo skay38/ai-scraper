@@ -2,10 +2,10 @@
 # Pre-commit hook: blocks commit if checks fail
 
 INPUT=$(cat)
-COMMAND=$(echo "$INPUT" | jq -r '.tool_input.command // empty')
+COMMAND=$(echo "$INPUT" | jq -r '.tool_input.command // empty' 2>/dev/null) || exit 0
 
 # Only intercept git commit commands
-if [[ "$COMMAND" != *"git commit"* ]] && [[ "$COMMAND" != *"git-commit"* ]]; then
+if [[ -z "$COMMAND" ]] || { [[ "$COMMAND" != *"git commit"* ]] && [[ "$COMMAND" != *"git-commit"* ]]; }; then
     exit 0
 fi
 

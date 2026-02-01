@@ -20,11 +20,6 @@
             "type": "command",
             "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/pre-commit.sh",
             "timeout": 120
-          },
-          {
-            "type": "prompt",
-            "prompt": "If this is a git commit command, quickly review the staged changes against CLAUDE.md guidelines. Check for: print() statements, generic exceptions, missing type annotations, vague names, raw dicts instead of models. If issues found, respond with 'BLOCK: <reason>'. If OK, respond with 'ALLOW'.",
-            "timeout": 60
           }
         ]
       }
