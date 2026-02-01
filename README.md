@@ -88,3 +88,15 @@ If you have additional time, assess the quality of extracted information by impl
 | **Evaluation** | Ability to track evolution of the quality of the data |
 
 Good luck ! 🚀
+
+---
+
+## Development Setup
+
+After cloning, activate the pre-commit hooks:
+
+```bash
+git config core.hooksPath .githooks
+```
+
+This runs format, lint, typecheck, and tests before each commit.
