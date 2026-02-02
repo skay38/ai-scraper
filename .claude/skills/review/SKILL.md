@@ -18,7 +18,11 @@ Perform a complete code review on the project or specified files.
 
 1. **Run automated checks** by invoking `/check` (format, lint, typecheck, test)
 
-2. **If checks pass**, perform qualitative review against CLAUDE.md guidelines:
+2. **Run simplify analysis** by invoking `/simplify` to identify complexity and redundancy issues
+
+3. **Check LLM prompts** by invoking `/llm-prompts` if the codebase contains LLM integrations
+
+4. **If checks pass**, perform qualitative review against CLAUDE.md guidelines:
 
 ### Check for Red Flags
 - `print()` statements in production code

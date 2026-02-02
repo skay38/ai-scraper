@@ -8,6 +8,7 @@ from anthropic import APIError, AsyncAnthropic, RateLimitError
 from anthropic.types import TextBlock
 from bs4 import BeautifulSoup
 
+from llm_prompts import build_company_extraction_prompt, build_pricing_extraction_prompt
 from models import BusinessType, CompanyExtractionData, PricingStatus
 from utils import (
     ANTHROPIC_CONCURRENCY,
@@ -111,29 +112,9 @@ class AnthropicClient:
             extra={"original_length": len(cleaned), "truncated_length": len(truncated)},
         )
 
-        prompt = f"""You are a data extraction assistant. Analyze the following text content from {url} and extract structured company information.
-
-Extract the following information:
-1. company_name: The official name of the company
-2. company_description: A 1-2 sentence description of what the company does
-3. business_type: Classify as "B2B", "B2C", or "B2B2C" (use "Unknown" if unclear)
-4. pricing: Extract pricing information if available on this page. If not found, return "Not found on main page"
-5. pricing_urls: List of URLs (absolute URLs, not relative paths) that likely contain pricing information. Look for links with text like "Pricing", "Plans", "Get Started", etc. Return empty array if none found.
-
-Content (first {HTML_TRUNCATE_MAIN} characters):
-{truncated}
-
-Return ONLY a JSON object with this exact structure (no markdown, no explanation):
-{{
-  "company_name": "string",
-  "company_description": "string",
-  "business_type": "string",
-  "pricing": "string",
-  "pricing_urls": ["string"]
-}}
-
-Be concise and accurate. If information is not available, use "Unknown".
-"""
+        prompt = build_company_extraction_prompt(
+            url=url, content=truncated, max_chars=HTML_TRUNCATE_MAIN
+        )
 
         try:
             success, response, error_type = await self._call_api(prompt)
@@ -223,22 +204,9 @@ Be concise and accurate. If information is not available, use "Unknown".
         cleaned = self._clean_html(html)
         truncated = cleaned[:HTML_TRUNCATE_PRICING]
 
-        prompt = f"""You are analyzing a pricing page. Extract detailed pricing information from this text content.
-
-Focus on:
-- Pricing tiers/plans and their costs
-- Billing frequency (monthly, annual)
-- Key features or limits per tier
-- Any special pricing notes
-
-Content (first {HTML_TRUNCATE_PRICING} characters):
-{truncated}
-
-Return a concise summary of the pricing structure (2-3 sentences max).
-If no pricing information is found, return "No pricing information available".
-
-Provide ONLY the pricing summary, no other text or explanation.
-"""
+        prompt = build_pricing_extraction_prompt(
+            content=truncated, max_chars=HTML_TRUNCATE_PRICING
+        )
 
         try:
             success, response, error_type = await self._call_api(prompt)

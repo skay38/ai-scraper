@@ -47,6 +47,9 @@ project/
 │   └── enums.py
 ├── services/            # Business logic
 │   └── ...
+├── llm_prompts/         # LLM prompt constants and builders
+│   ├── __init__.py
+│   └── extraction.py
 ├── utils/               # Core utilities (config, logger, exceptions, helpers)
 │   ├── __init__.py
 │   ├── config.py
