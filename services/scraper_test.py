@@ -4,8 +4,7 @@ from unittest.mock import AsyncMock, MagicMock
 
 import pytest
 
-from enums import PricingStatus
-from models import CompanyExtractionData
+from models import CompanyExtractionData, PricingStatus
 from services.scraper import ScraperService
 
 

@@ -2,7 +2,7 @@
 
 from pydantic import BaseModel, Field
 
-from enums import BusinessType, PricingStatus
+from models.enums import BusinessType, PricingStatus
 
 
 class CompanyExtractionData(BaseModel):

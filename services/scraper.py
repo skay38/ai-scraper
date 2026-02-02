@@ -4,12 +4,10 @@ import asyncio
 
 from pydantic import ValidationError as PydanticValidationError
 
-from config import MAX_PRICING_URLS
-from enums import PricingStatus
-from exceptions import ValidationError
-from models import ScrapingData, ScrapingResult
+from models import PricingStatus, ScrapingData, ScrapingResult
 from services.anthropic_client import AnthropicClient
 from services.http_client import HttpClient
+from utils import MAX_PRICING_URLS, ValidationError
 
 
 class ScraperService:

@@ -5,10 +5,8 @@ import json
 from pathlib import Path
 from time import time
 
-from config import ANTHROPIC_CONCURRENCY, HTTP_CONCURRENCY
-from enums import PricingStatus
-from logger import logger
-from models import BatchScrapingResult, ScrapingResult
+from models import BatchScrapingResult, PricingStatus, ScrapingResult
+from utils import ANTHROPIC_CONCURRENCY, HTTP_CONCURRENCY, logger
 from services.anthropic_client import AnthropicClient
 from services.http_client import HttpClient
 from services.scraper import ScraperService

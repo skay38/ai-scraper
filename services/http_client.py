@@ -5,21 +5,14 @@ import random
 
 import httpx
 
-from config import (
+from utils import (
     HTTP_CONCURRENCY,
     HTTP_MAX_RETRIES,
     HTTP_RETRY_BACKOFF,
     HTTP_TIMEOUT_CONNECT,
     HTTP_TIMEOUT_READ,
     USER_AGENTS,
-)
-from exceptions import (
-    ConnectionTimeoutError,
     ContentTypeError,
-    HttpClientError,
-    NetworkError,
-    ReadTimeoutError,
-    TooManyRedirectsError,
 )
 
 
@@ -101,16 +94,6 @@ class HttpClient:
                     return (False, error_msg, error_type)
                 except ContentTypeError as e:
                     return (False, str(e), "invalid_content_type")
-                except (
-                    ConnectionTimeoutError,
-                    ReadTimeoutError,
-                    NetworkError,
-                    TooManyRedirectsError,
-                    HttpClientError,
-                ) as e:
-                    error_msg = str(e)
-                    error_type = type(e).__name__
-                    return (False, error_msg, error_type)
 
                 if attempt < HTTP_MAX_RETRIES - 1:
                     await asyncio.sleep(HTTP_RETRY_BACKOFF * (2**attempt))

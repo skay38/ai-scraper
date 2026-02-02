@@ -4,10 +4,14 @@ from pathlib import Path
 
 from dotenv import load_dotenv
 
-from config import DEFAULT_IMPORT_LIMIT, OUTPUT_FILE
-from logger import logger
 from services.batch_scraper import BatchScraperService
-from utils import display_result, load_domains
+from utils import (
+    DEFAULT_IMPORT_LIMIT,
+    OUTPUT_FILE,
+    display_result,
+    load_domains,
+    logger,
+)
 
 load_dotenv()
 

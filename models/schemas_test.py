@@ -3,8 +3,13 @@
 import pytest
 from pydantic import ValidationError
 
-from enums import BusinessType, PricingStatus
-from models import CompanyExtractionData, ScrapingData, ScrapingResult
+from models import (
+    BusinessType,
+    CompanyExtractionData,
+    PricingStatus,
+    ScrapingData,
+    ScrapingResult,
+)
 
 
 class TestCompanyExtractionData:

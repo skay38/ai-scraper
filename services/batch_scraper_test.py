@@ -6,8 +6,7 @@ from unittest.mock import AsyncMock, patch
 
 import pytest
 
-from enums import PricingStatus
-from models import BatchScrapingResult, ScrapingData, ScrapingResult
+from models import BatchScrapingResult, PricingStatus, ScrapingData, ScrapingResult
 from services.batch_scraper import BatchScraperService
 
 

@@ -98,7 +98,7 @@ class TestDisplayResult:
         result = ScrapingResult(url="https://test.com", success=True, data=data)
 
         # Act / Assert
-        with patch("utils.logger") as mock_logger:
+        with patch("utils.helpers.logger") as mock_logger:
             display_result(result)
             mock_logger.info.assert_called_once()
             call_kwargs = mock_logger.info.call_args
@@ -113,7 +113,7 @@ class TestDisplayResult:
         )
 
         # Act / Assert
-        with patch("utils.logger") as mock_logger:
+        with patch("utils.helpers.logger") as mock_logger:
             display_result(result)
             mock_logger.warning.assert_called_once()
             call_kwargs = mock_logger.warning.call_args
@@ -126,6 +126,6 @@ class TestDisplayResult:
         result = ScrapingResult(url="https://test.com", success=True, data=None)
 
         # Act / Assert
-        with patch("utils.logger") as mock_logger:
+        with patch("utils.helpers.logger") as mock_logger:
             display_result(result)
             mock_logger.warning.assert_called_once()
