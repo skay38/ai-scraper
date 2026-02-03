@@ -1,7 +1,7 @@
 from pathlib import Path
 
-from models import ScrapingResult
-from utils.logger import logger
+from src.models import ScrapingResult
+from src.utils.logger import logger
 
 
 def load_domains(path: Path, limit: int) -> list[str]:

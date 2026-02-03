@@ -6,8 +6,8 @@ from unittest.mock import AsyncMock, patch
 
 import pytest
 
-from models import BatchScrapingResult, PricingStatus, ScrapingData, ScrapingResult
-from services.batch_scraper import BatchScraperService
+from src.models import BatchScrapingResult, PricingStatus, ScrapingData, ScrapingResult
+from src.services.batch_scraper import BatchScraperService
 
 
 def create_scraping_result(

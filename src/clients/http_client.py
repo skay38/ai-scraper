@@ -5,7 +5,7 @@ import random
 
 import httpx
 
-from utils import (
+from src.utils import (
     HTTP_CONCURRENCY,
     HTTP_MAX_RETRIES,
     HTTP_RETRY_BACKOFF,

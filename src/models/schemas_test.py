@@ -3,7 +3,7 @@
 import pytest
 from pydantic import ValidationError
 
-from models import (
+from src.models import (
     BusinessType,
     CompanyExtractionData,
     PricingStatus,
@@ -22,7 +22,7 @@ class TestCompanyExtractionData:
 
         # Assert
         assert data.company_name == BusinessType.UNKNOWN.value
-        assert data.company_description == BusinessType.UNKNOWN.value
+        assert data.company_description == ""
         assert data.business_type == BusinessType.UNKNOWN.value
         assert data.pricing == PricingStatus.NOT_FOUND_ON_MAIN_PAGE.value
         assert data.pricing_urls == []
@@ -55,7 +55,7 @@ class TestCompanyExtractionData:
 
         # Assert
         assert data.company_name == "Test Co"
-        assert data.company_description == BusinessType.UNKNOWN.value
+        assert data.company_description == ""
         assert data.pricing_urls == []
 
 

@@ -4,8 +4,8 @@ from pathlib import Path
 
 from dotenv import load_dotenv
 
-from services.batch_scraper import BatchScraperService
-from utils import (
+from src.services.batch_scraper import BatchScraperService
+from src.utils import (
     DEFAULT_IMPORT_LIMIT,
     OUTPUT_FILE,
     display_result,

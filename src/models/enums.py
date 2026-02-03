@@ -11,6 +11,11 @@ class PricingStatus(StrEnum):
     NO_PRICING_INFO = "No pricing information available"
     UNKNOWN = "Unknown"
 
+    @classmethod
+    def empty_statuses(cls) -> list["PricingStatus"]:
+        """Return list of statuses that indicate no pricing was found."""
+        return [cls.NOT_AVAILABLE, cls.NOT_FOUND_ON_MAIN_PAGE, cls.UNKNOWN]
+
 
 class BusinessType(StrEnum):
     """Business type classification."""

@@ -4,8 +4,8 @@ from unittest.mock import AsyncMock, MagicMock
 
 import pytest
 
-from models import CompanyExtractionData, PricingStatus
-from services.scraper import ScraperService
+from src.models import CompanyExtractionData, PricingStatus
+from src.services.scraper import ScraperService
 
 
 @pytest.fixture
@@ -15,19 +15,19 @@ def mock_http_client() -> MagicMock:
 
 
 @pytest.fixture
-def mock_anthropic_client() -> MagicMock:
-    """Create mock Anthropic client."""
+def mock_extraction_service() -> MagicMock:
+    """Create mock extraction service."""
     return MagicMock()
 
 
 @pytest.fixture
 def scraper(
-    mock_http_client: MagicMock, mock_anthropic_client: MagicMock
+    mock_http_client: MagicMock, mock_extraction_service: MagicMock
 ) -> ScraperService:
     """Create scraper service with mocked dependencies."""
     return ScraperService(
         http_client=mock_http_client,
-        anthropic_client=mock_anthropic_client,
+        extraction_service=mock_extraction_service,
     )
 
 
@@ -35,18 +35,18 @@ class TestScraperServiceInit:
     """Tests for ScraperService initialization."""
 
     def test_stores_clients(
-        self, mock_http_client: MagicMock, mock_anthropic_client: MagicMock
+        self, mock_http_client: MagicMock, mock_extraction_service: MagicMock
     ) -> None:
         """Stores provided clients."""
         # Act
         service = ScraperService(
             http_client=mock_http_client,
-            anthropic_client=mock_anthropic_client,
+            extraction_service=mock_extraction_service,
         )
 
         # Assert
         assert service.http_client is mock_http_client
-        assert service.anthropic_client is mock_anthropic_client
+        assert service.extraction_service is mock_extraction_service
 
 
 class TestScraperServiceScrapeUrl:
@@ -75,14 +75,14 @@ class TestScraperServiceScrapeUrl:
         self,
         scraper: ScraperService,
         mock_http_client: MagicMock,
-        mock_anthropic_client: MagicMock,
+        mock_extraction_service: MagicMock,
     ) -> None:
         """Returns error result when AI extraction fails."""
         # Arrange
         mock_http_client.get = AsyncMock(
             return_value=(True, "<html>content</html>", None)
         )
-        mock_anthropic_client.extract_company_data = AsyncMock(
+        mock_extraction_service.extract_company_data = AsyncMock(
             return_value=(False, None, "API error")
         )
 
@@ -99,7 +99,7 @@ class TestScraperServiceScrapeUrl:
         self,
         scraper: ScraperService,
         mock_http_client: MagicMock,
-        mock_anthropic_client: MagicMock,
+        mock_extraction_service: MagicMock,
     ) -> None:
         """Returns success when scraping completes without pricing URLs."""
         # Arrange
@@ -113,7 +113,7 @@ class TestScraperServiceScrapeUrl:
             pricing="$99/month",
             pricing_urls=[],
         )
-        mock_anthropic_client.extract_company_data = AsyncMock(
+        mock_extraction_service.extract_company_data = AsyncMock(
             return_value=(True, extracted_data, None)
         )
 
@@ -131,7 +131,7 @@ class TestScraperServiceScrapeUrl:
         self,
         scraper: ScraperService,
         mock_http_client: MagicMock,
-        mock_anthropic_client: MagicMock,
+        mock_extraction_service: MagicMock,
     ) -> None:
         """Fetches pricing pages and aggregates pricing info."""
         # Arrange
@@ -148,10 +148,10 @@ class TestScraperServiceScrapeUrl:
             pricing=PricingStatus.NOT_FOUND_ON_MAIN_PAGE,
             pricing_urls=["https://example.com/pricing"],
         )
-        mock_anthropic_client.extract_company_data = AsyncMock(
+        mock_extraction_service.extract_company_data = AsyncMock(
             return_value=(True, extracted_data, None)
         )
-        mock_anthropic_client.extract_pricing = AsyncMock(
+        mock_extraction_service.extract_pricing = AsyncMock(
             return_value=(True, "$49/month", None)
         )
 
@@ -264,14 +264,14 @@ class TestScraperServiceFetchAndExtractPricing:
         self,
         scraper: ScraperService,
         mock_http_client: MagicMock,
-        mock_anthropic_client: MagicMock,
+        mock_extraction_service: MagicMock,
     ) -> None:
         """Returns None when page has no pricing info."""
         # Arrange
         mock_http_client.get = AsyncMock(
             return_value=(True, "<html>content</html>", None)
         )
-        mock_anthropic_client.extract_pricing = AsyncMock(
+        mock_extraction_service.extract_pricing = AsyncMock(
             return_value=(True, PricingStatus.NO_PRICING_INFO, None)
         )
 
@@ -286,14 +286,14 @@ class TestScraperServiceFetchAndExtractPricing:
         self,
         scraper: ScraperService,
         mock_http_client: MagicMock,
-        mock_anthropic_client: MagicMock,
+        mock_extraction_service: MagicMock,
     ) -> None:
         """Returns pricing summary when extraction succeeds."""
         # Arrange
         mock_http_client.get = AsyncMock(
             return_value=(True, "<html>content</html>", None)
         )
-        mock_anthropic_client.extract_pricing = AsyncMock(
+        mock_extraction_service.extract_pricing = AsyncMock(
             return_value=(True, "$99/month", None)
         )
 
@@ -323,14 +323,14 @@ class TestScraperServiceFetchPricingPages:
         self,
         scraper: ScraperService,
         mock_http_client: MagicMock,
-        mock_anthropic_client: MagicMock,
+        mock_extraction_service: MagicMock,
     ) -> None:
         """Limits pricing URLs to MAX_PRICING_URLS."""
         # Arrange
         mock_http_client.get = AsyncMock(
             return_value=(True, "<html>content</html>", None)
         )
-        mock_anthropic_client.extract_pricing = AsyncMock(
+        mock_extraction_service.extract_pricing = AsyncMock(
             return_value=(True, "$99/month", None)
         )
         urls = [f"https://example.com/pricing{i}" for i in range(10)]

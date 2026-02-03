@@ -19,30 +19,6 @@ class ContentTypeError(HttpClientError):
     pass
 
 
-class ConnectionTimeoutError(HttpClientError):
-    """Connection timeout error."""
-
-    pass
-
-
-class ReadTimeoutError(HttpClientError):
-    """Read timeout error."""
-
-    pass
-
-
-class NetworkError(HttpClientError):
-    """Network error."""
-
-    pass
-
-
-class TooManyRedirectsError(HttpClientError):
-    """Too many redirects error."""
-
-    pass
-
-
 class AnthropicClientError(ScraperError):
     """Anthropic API client errors."""
 
@@ -63,12 +39,6 @@ class ApiResponseError(AnthropicClientError):
 
 class JsonParseError(AnthropicClientError):
     """JSON parsing error."""
-
-    pass
-
-
-class DataExtractionError(ScraperError):
-    """Data extraction error."""
 
     pass
 

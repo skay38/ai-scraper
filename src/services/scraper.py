@@ -4,10 +4,10 @@ import asyncio
 
 from pydantic import ValidationError as PydanticValidationError
 
-from models import PricingStatus, ScrapingData, ScrapingResult
-from services.anthropic_client import AnthropicClient
-from services.http_client import HttpClient
-from utils import MAX_PRICING_URLS, ValidationError
+from src.clients.http_client import HttpClient
+from src.models import PricingStatus, ScrapingData, ScrapingResult
+from src.services.extraction_service import ExtractionService
+from src.utils import MAX_PRICING_URLS, ValidationError
 
 
 class ScraperService:
@@ -16,23 +16,23 @@ class ScraperService:
     def __init__(
         self,
         http_client: HttpClient,
-        anthropic_client: AnthropicClient,
+        extraction_service: ExtractionService,
     ) -> None:
         """Initialize scraper service.
 
         Args:
             http_client: HTTP client for fetching pages
-            anthropic_client: Anthropic client for data extraction
+            extraction_service: Service for extracting data using AI
         """
         self.http_client = http_client
-        self.anthropic_client = anthropic_client
+        self.extraction_service = extraction_service
 
     async def scrape_url(self, url: str) -> ScrapingResult:
         """Scrape a URL and extract company data.
 
         Multi-step flow:
         1. Fetch main URL
-        2. Extract company data + pricing URLs from Anthropic
+        2. Extract company data + pricing URLs
         3. Fetch pricing URLs (if any)
         4. Extract pricing from pricing pages
         5. Aggregate all data
@@ -52,7 +52,7 @@ class ScraperService:
             success,
             extracted_data,
             error_msg,
-        ) = await self.anthropic_client.extract_company_data(content, url)
+        ) = await self.extraction_service.extract_company_data(content, url)
         if not success or extracted_data is None:
             return ScrapingResult(
                 url=url, success=False, error=f"AI extraction failed: {error_msg}"
@@ -113,7 +113,7 @@ class ScraperService:
             success,
             pricing_summary,
             error_msg,
-        ) = await self.anthropic_client.extract_pricing(content)
+        ) = await self.extraction_service.extract_pricing(content)
         if not success or pricing_summary == PricingStatus.NO_PRICING_INFO:
             return None
 
@@ -137,13 +137,9 @@ class ScraperService:
             if p is not None and not isinstance(p, BaseException) and p.strip()
         ]
 
-        no_pricing_values = [
-            PricingStatus.NOT_FOUND_ON_MAIN_PAGE,
-            PricingStatus.NOT_AVAILABLE,
-            PricingStatus.UNKNOWN,
-        ]
-
-        main_has_pricing = main_pricing and main_pricing not in no_pricing_values
+        main_has_pricing = (
+            main_pricing and main_pricing not in PricingStatus.empty_statuses()
+        )
 
         if not valid_pricing and not main_has_pricing:
             return PricingStatus.NOT_AVAILABLE

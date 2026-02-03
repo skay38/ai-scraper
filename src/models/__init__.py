@@ -1,7 +1,7 @@
 """Data models and enums for the AI scraper."""
 
-from models.enums import BusinessType, PricingStatus
-from models.schemas import (
+from src.models.enums import BusinessType, PricingStatus
+from src.models.schemas import (
     BatchScrapingResult,
     CompanyExtractionData,
     ScrapingData,

@@ -5,11 +5,12 @@ import json
 from pathlib import Path
 from time import time
 
-from models import BatchScrapingResult, PricingStatus, ScrapingResult
-from utils import ANTHROPIC_CONCURRENCY, HTTP_CONCURRENCY, logger
-from services.anthropic_client import AnthropicClient
-from services.http_client import HttpClient
-from services.scraper import ScraperService
+from src.clients.anthropic_client import AnthropicClient
+from src.clients.http_client import HttpClient
+from src.models import BatchScrapingResult, PricingStatus, ScrapingResult
+from src.services.extraction_service import ExtractionService
+from src.services.scraper import ScraperService
+from src.utils import ANTHROPIC_CONCURRENCY, HTTP_CONCURRENCY, logger
 
 
 class BatchScraperService:
@@ -28,9 +29,12 @@ class BatchScraperService:
         self._anthropic_client = AnthropicClient(
             api_key=api_key, semaphore=anthropic_semaphore
         )
+        self._extraction_service = ExtractionService(
+            anthropic_client=self._anthropic_client
+        )
         self._scraper = ScraperService(
             http_client=self._http_client,
-            anthropic_client=self._anthropic_client,
+            extraction_service=self._extraction_service,
         )
 
     async def scrape_domains(self, domains: list[str]) -> BatchScrapingResult:
@@ -111,15 +115,12 @@ class BatchScraperService:
         Returns:
             Number of results with extracted pricing
         """
-        no_pricing_statuses = [
-            PricingStatus.NOT_AVAILABLE,
-            PricingStatus.NOT_FOUND_ON_MAIN_PAGE,
-            PricingStatus.UNKNOWN,
-        ]
         return sum(
             1
             for r in results
-            if r.success and r.data and r.data.pricing not in no_pricing_statuses
+            if r.success
+            and r.data
+            and r.data.pricing not in PricingStatus.empty_statuses()
         )
 
     def save_results(self, results: list[ScrapingResult], output_path: Path) -> None:

@@ -6,7 +6,7 @@ from unittest.mock import AsyncMock, MagicMock, patch
 import httpx
 import pytest
 
-from services.http_client import HttpClient
+from src.clients.http_client import HttpClient
 
 
 @pytest.fixture
@@ -64,7 +64,9 @@ class TestHttpClientGet:
         mock_client.__aenter__ = AsyncMock(return_value=mock_client)
         mock_client.__aexit__ = AsyncMock(return_value=None)
 
-        with patch("services.http_client.httpx.AsyncClient", return_value=mock_client):
+        with patch(
+            "src.clients.http_client.httpx.AsyncClient", return_value=mock_client
+        ):
             # Act
             success, content, error_type = await http_client.get("https://example.com")
 
@@ -87,7 +89,9 @@ class TestHttpClientGet:
         mock_client.__aenter__ = AsyncMock(return_value=mock_client)
         mock_client.__aexit__ = AsyncMock(return_value=None)
 
-        with patch("services.http_client.httpx.AsyncClient", return_value=mock_client):
+        with patch(
+            "src.clients.http_client.httpx.AsyncClient", return_value=mock_client
+        ):
             # Act
             await http_client.get("example.com")
 
@@ -108,7 +112,9 @@ class TestHttpClientGet:
         mock_client.__aenter__ = AsyncMock(return_value=mock_client)
         mock_client.__aexit__ = AsyncMock(return_value=None)
 
-        with patch("services.http_client.httpx.AsyncClient", return_value=mock_client):
+        with patch(
+            "src.clients.http_client.httpx.AsyncClient", return_value=mock_client
+        ):
             # Act
             success, content, error_type = await http_client.get("https://example.com")
 
@@ -127,8 +133,10 @@ class TestHttpClientGet:
         mock_client.__aexit__ = AsyncMock(return_value=None)
 
         with (
-            patch("services.http_client.httpx.AsyncClient", return_value=mock_client),
-            patch("services.http_client.HTTP_MAX_RETRIES", 1),
+            patch(
+                "src.clients.http_client.httpx.AsyncClient", return_value=mock_client
+            ),
+            patch("src.clients.http_client.HTTP_MAX_RETRIES", 1),
         ):
             # Act
             success, content, error_type = await http_client.get("https://example.com")
@@ -148,8 +156,10 @@ class TestHttpClientGet:
         mock_client.__aexit__ = AsyncMock(return_value=None)
 
         with (
-            patch("services.http_client.httpx.AsyncClient", return_value=mock_client),
-            patch("services.http_client.HTTP_MAX_RETRIES", 1),
+            patch(
+                "src.clients.http_client.httpx.AsyncClient", return_value=mock_client
+            ),
+            patch("src.clients.http_client.HTTP_MAX_RETRIES", 1),
         ):
             # Act
             success, content, error_type = await http_client.get("https://example.com")
@@ -175,7 +185,9 @@ class TestHttpClientGet:
         mock_client.__aenter__ = AsyncMock(return_value=mock_client)
         mock_client.__aexit__ = AsyncMock(return_value=None)
 
-        with patch("services.http_client.httpx.AsyncClient", return_value=mock_client):
+        with patch(
+            "src.clients.http_client.httpx.AsyncClient", return_value=mock_client
+        ):
             # Act
             success, content, error_type = await http_client.get("https://example.com")
 
@@ -210,8 +222,10 @@ class TestHttpClientGet:
         mock_client.__aexit__ = AsyncMock(return_value=None)
 
         with (
-            patch("services.http_client.httpx.AsyncClient", return_value=mock_client),
-            patch("services.http_client.HTTP_RETRY_BACKOFF", 0.001),
+            patch(
+                "src.clients.http_client.httpx.AsyncClient", return_value=mock_client
+            ),
+            patch("src.clients.http_client.HTTP_RETRY_BACKOFF", 0.001),
         ):
             # Act
             success, content, error_type = await http_client.get("https://example.com")
@@ -232,8 +246,10 @@ class TestHttpClientGet:
         mock_client.__aexit__ = AsyncMock(return_value=None)
 
         with (
-            patch("services.http_client.httpx.AsyncClient", return_value=mock_client),
-            patch("services.http_client.HTTP_MAX_RETRIES", 1),
+            patch(
+                "src.clients.http_client.httpx.AsyncClient", return_value=mock_client
+            ),
+            patch("src.clients.http_client.HTTP_MAX_RETRIES", 1),
         ):
             # Act
             success, content, error_type = await http_client.get("https://example.com")
@@ -254,7 +270,9 @@ class TestHttpClientGet:
         mock_client.__aenter__ = AsyncMock(return_value=mock_client)
         mock_client.__aexit__ = AsyncMock(return_value=None)
 
-        with patch("services.http_client.httpx.AsyncClient", return_value=mock_client):
+        with patch(
+            "src.clients.http_client.httpx.AsyncClient", return_value=mock_client
+        ):
             # Act
             success, content, error_type = await http_client.get("https://example.com")
 

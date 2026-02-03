@@ -1,6 +1,6 @@
 """Utility modules for the AI scraper."""
 
-from utils.config import (
+from src.utils.config import (
     ANTHROPIC_CONCURRENCY,
     ANTHROPIC_MODEL,
     DEFAULT_IMPORT_LIMIT,
@@ -16,23 +16,18 @@ from utils.config import (
     OUTPUT_FILE,
     USER_AGENTS,
 )
-from utils.exceptions import (
+from src.utils.exceptions import (
     AnthropicClientError,
     ApiResponseError,
-    ConnectionTimeoutError,
     ContentTypeError,
-    DataExtractionError,
     HttpClientError,
     JsonParseError,
-    NetworkError,
     RateLimitExceededError,
-    ReadTimeoutError,
     ScraperError,
-    TooManyRedirectsError,
     ValidationError,
 )
-from utils.helpers import display_result, load_domains
-from utils.logger import logger, setup_logger
+from src.utils.helpers import display_result, load_domains
+from src.utils.logger import logger, setup_logger
 
 __all__ = [
     # Config
@@ -53,16 +48,11 @@ __all__ = [
     # Exceptions
     "AnthropicClientError",
     "ApiResponseError",
-    "ConnectionTimeoutError",
     "ContentTypeError",
-    "DataExtractionError",
     "HttpClientError",
     "JsonParseError",
-    "NetworkError",
     "RateLimitExceededError",
-    "ReadTimeoutError",
     "ScraperError",
-    "TooManyRedirectsError",
     "ValidationError",
     # Helpers
     "display_result",

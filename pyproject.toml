@@ -20,3 +20,15 @@ dev = [
     "pytest-cov>=7.0.0",
     "ruff>=0.9.6",
 ]
+
+[tool.pytest.ini_options]
+testpaths = ["src"]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
+
+[tool.ruff]
+src = ["src"]
+
+[tool.pyright]
+pythonVersion = "3.13"
+include = ["src", "main.py"]

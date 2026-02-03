@@ -2,14 +2,14 @@
 
 from pydantic import BaseModel, Field
 
-from models.enums import BusinessType, PricingStatus
+from src.models.enums import BusinessType, PricingStatus
 
 
 class CompanyExtractionData(BaseModel):
     """Data extracted from company page by LLM."""
 
     company_name: str = Field(default=BusinessType.UNKNOWN.value)
-    company_description: str = Field(default=BusinessType.UNKNOWN.value)
+    company_description: str = Field(default="")
     business_type: str = Field(default=BusinessType.UNKNOWN.value)
     pricing: str = Field(default=PricingStatus.NOT_FOUND_ON_MAIN_PAGE.value)
     pricing_urls: list[str] = Field(default_factory=list)

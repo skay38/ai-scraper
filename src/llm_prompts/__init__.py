@@ -1,6 +1,6 @@
 """LLM prompt constants and builders."""
 
-from llm_prompts.extraction import (
+from src.llm_prompts.extraction import (
     build_company_extraction_prompt,
     build_pricing_extraction_prompt,
 )
